@@ -1,0 +1,3 @@
+<li class>
+            <a href="#barChartTab" data-toggle="tab">Bar Chart–Molecules</a>
+         </li>

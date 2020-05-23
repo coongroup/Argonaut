@@ -1,0 +1,3 @@
+<li class>
+	<a href="#scatterCorrelationTable" data-toggle="tab" ng-click="scatterTabClick()">Scatter–Correlations</a>
+</li>

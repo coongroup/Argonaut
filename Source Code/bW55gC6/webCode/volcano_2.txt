@@ -1,0 +1,173 @@
+<div class="tab-pane" id="volcanoFullProfileTab" style="padding-left:0px; margin-top:20px">
+   <div class="col-md-10 center-margin">
+      <div ng-controller="fullVolcanoCtrl" id="volcCtrl">
+         <h2>Volcano Plot-Full Perturbation Profile {{conditionName}}</h2>
+         <h5 style="color:red; font-style:italic">{{overflow}}</h5>
+         <div class="col-lg-12 row" style="margin-bottom:0px">
+            <div class="col-md-10" style="padding-left:0px; padding-right:0px">
+               <!-- Volcano plot here-->
+               <div id="fullVolcanoColumn">
+                  <full-volcano data="volcano_full_plot_data" attr1="{{pValueCutoff}}", attr2="{{foldChangeCutoff}}", attr3="{{fixedScale}}"
+                  attr4 ="{{fixedScaleX}}" attr5="{{fixedScaleY}}", attr6="{{overflow}}", attr7="{{speedMode}}", attr8="{{testingCorrection}}"></full-volcano>
+               </div>
+               <div class="panel-group" id="accordionVolcMeta" style="margin-top:0px; width:95%; padding-bottom:40px; text-align:block">
+                  <div class="panel">
+                     <div class="panel-heading">
+                        <h4 class="panel-title">
+                           <a data-toggle="collapse" data-parent="#accordionVolcMeta" href="#collapseVolcMeta" aria-expanded="false" class="collapsed"; style="opacity:1">
+                           Tooltip Information (Click Datapoint to Populate)
+                           </a>
+                        </h4>
+                     </div>
+                     <div id="collapseVolcMeta" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                           <div class="col-md-8">
+                              <div>
+                                 <h3 style="padding-bottom:10px">Molecule Metadata - {{selectedMolecule}}</h3>
+                                 <div ng-bind-html="tooltipText" style="padding-bottom:0px; word-break: break-all"></div>
+                              </div>
+                           </div>
+                           <div class="col-md-4">
+                              <div>
+                                 <h3 style="padding-bottom:10px">Tooltip Information</h3>
+                                 <div ng-bind-html="tooltipQuantText" style="padding-bottom:0px"></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-2" style="padding-left:0px; padding-right:0px">
+               <h4 style="margin-bottom:10px">Select a Branch</h4>
+               <select id="fullVolcanoBranchSelect" style="margin-bottom:10px" class="form-control"  ng-model='fullVolcanoBranch' required="required" data-ng-options="v as v.branch_name for v in volcano_full_branch_data track by v.branch_id" ng-change="branchChanged(fullVolcanoBranch.branch_id,fullVolcanoBranch.branch_name)">
+                  <option style="display:none" value=""></option>
+               </select>
+               <h4 style="margin-bottom:10px">Select a Condition</h4>
+               <select id="fullVolcanoConditionSelect" style="margin-bottom:20px" class="form-control"  ng-model='fullVolcanoCondition' required="required" data-ng-options="v as v.condition_name for v in volcano_full_conditions | orderBy:'condition_name' track by v.condition_id" ng-change="conditionChanged(fullVolcanoCondition.condition_id, fullVolcanoCondition.condition_name)">
+                  <option style="display:none" value=""></option>
+               </select>
+               <hr style="opacity:1">
+               <div class="panel-group" id="accordion" style="margin-top:20px">
+                  <div class="panel">
+                     <div class="panel-heading">
+                        <h4 class="panel-title">
+                           <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" class="collapsed">
+                           Chart Settings
+                           </a>
+                        </h4>
+                     </div>
+                     <div id="collapseOne" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                           <h5 style="margin:5px">Multiple Testing Correction</h5>
+                           <form name="myForm">
+                              <input type="radio" ng-model="testingCorrection" value="uncorrected">
+                              Uncorrected
+                              <br/>
+                              <input type="radio" ng-model="testingCorrection" value="fdradjusted">
+                              FDR
+                              <br/>
+                              <input type="radio" ng-model="testingCorrection" value="bonferroni">
+                              Bonferroni
+                              <br/>
+                           </form>
+                           <h5 style="margin:5px; padding-top:10px">P-Value Cutoff</h5>
+                           <input class="form-control" id="" ng-model="pValueCutoff" style="margin-bottom:15px">
+                           <h5 style="margin:5px">Fold Change Cutoff (±)</h5>
+                           <input type="text" class="form-control" id=""  ng-model="foldChangeCutoff" style="margin-bottom:10px">
+                           <label class="checkbox-inline">
+                           <input type="checkbox" id="" ng-model="speedMode" style="margin-bottom:15px">
+                           Speed Mode
+                           </label>
+                           </br>
+                           <label class="checkbox-inline" style="margin-top:10px">
+                           <input type="checkbox" id="" ng-model="fixedScale" style="margin-bottom:15px;">
+                           Fixed Scale
+                           </label>
+                           <h5 style="margin:5px; padding-top:5px">X-Axis Min/Max</h5>
+                           <input type="text" class="form-control" id="" ng-model="fixedScaleX" style="margin-bottom:15px" ng-disabled="!fixedScale">
+                           <h5 style="margin:5px">Y-Axis Max</h5>
+                           <input disabled type="text" class="form-control" ng-model="fixedScaleY" style="margin-bottom:15px" ng-disabled="!fixedScale">
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <hr style="opacity:1">
+               <!--Datapoint Search panel-->
+               <div class="panel-group" id="accordion3" style="margin-top:20px">
+                  <div class="panel">
+                     <div class="panel-heading">
+                        <h4 class="panel-title">
+                           <a data-toggle="collapse" data-parent="#accordion3" href="#collapseThree" aria-expanded="false" class="collapsed">
+                           Datapoint Search
+                           </a>
+                        </h4>
+                     </div>
+                     <div id="collapseThree" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                           <h5 style="margin:5px">Search for Datapoint on...</h5>
+                           <form name="volcanoTooltipCustomForm">
+                              <select id="moleculeSeekDropDown" style="margin-bottom:10px" class="form-control"  ng-model='moleculeSeekTerm' required="required" data-ng-options="v for v in moleculeSeekTerms">
+                                 <option style="display:none" value=""></option>
+                              </select>
+                           </form>
+                           <h5 style="margin:5px; margin-top:15px">Enter Query Text</h5>
+                           <ui-select multiple ng-model="queryTerm.terms" theme="bootstrap" style="width: 100%;margin-bottom:20px;" id="queryBox2" append-to-body="true"  on-remove="tagDeselect($item)" on-select="tagSelect($item)">
+                              <ui-select-match placeholder="Query Term"><span id="{{$item.$$hashKey}}">{{$item.text}}</span></ui-select-match>
+                              <ui-select-choices limit="25" refresh="searchMedia($select)" refresh-delay="400" repeat="searchRes in searchRes" id="choices" style="position:relative">
+                                 <div ng-bind-html="searchRes.text | highlight: $select.search"></div>
+                              </ui-select-choices>
+                           </ui-select>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <hr style="opacity:1">
+               <!--Tooltip customization panel-->
+               <div class="panel-group" id="accordion2" style="margin-top:20px">
+                  <div class="panel">
+                     <div class="panel-heading">
+                        <h4 class="panel-title">
+                           <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" aria-expanded="false" class="collapsed">
+                           Tooltip Customization
+                           </a>
+                        </h4>
+                     </div>
+                     <div id="collapseTwo" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                           <h5 style="margin:5px">Feature Descriptor Options</h5>
+                           <form name="volcanoTooltipCustomForm">
+                              <label ng-repeat="term in featureMetadataTerms" class="checkbox" style="font-weight:100">
+                              <input
+                                 type="checkbox"
+                                 ng-model="term.selected"
+                                 >{{term.name}}
+                              </label>
+                           </form>
+                           <label class="checkbox-inline" style="margin-top:10px">
+                           <input type="checkbox" id="" ng-model="volcanoShortenLongTerms" style="margin-bottom:15px;">
+                           Shorten Long Terms
+                           </label>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <hr style="opacity:1">
+               <button class="btn btn-alt btn-hover btn-primary" style="width:100%; margin-bottom:10px; margin-top:10px" ng-click="downloadData()">
+               <span>Download Chart Data</span>
+               <i class="glyph-icon icon-file-text-o"></i>
+               </button>
+               <button class="btn btn-alt btn-hover btn-primary" style="width:100%; margin-bottom:10px; margin-top:10px" ng-click="downloadSVG()">
+               <span>Download Chart SVG</span>
+               <i class="glyph-icon icon-file-image-o"></i>
+               </button>
+                <hr style="opacity:1">
+               <p style="text-align:center;padding-bottom:10px"><b>Figure Legend: </b>Fold changes in molecule abundance (condition/control) versus statistical significance (-log<sub>10</sub>[<i>p</i>-value]).</p>
+               <p style="padding-bottom:0px"><span style="color:green; font-size:20px;opacity:0.7">●</span> <i>P</i> < {{pValueCutoff}} and |log<sub>2</sub>(fold change)| > {{foldChangeCutoff}} </p>
+               <p style="padding-bottom:0px"><span style="color:dodgerblue; font-size:20px;opacity:0.7">●</span> <i>P</i> < {{pValueCutoff}} and |log<sub>2</sub>(fold change)| < {{foldChangeCutoff}} </p>
+               <p style="padding-bottom:20px"><span style="color:gray; font-size:20px;opacity:0.7">●</span> <i>P</i> > {{pValueCutoff}} </p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

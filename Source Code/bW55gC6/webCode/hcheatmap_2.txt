@@ -1,0 +1,283 @@
+<div class="tab-pane" id="hcHeatMapTab" style="padding-left:0px; margin-top:10px;width:100%;padding-top:0px">
+	<div ng-controller="hcHeatMapCtrl" id="hcHeatMapCtrlID">
+	   <div class="row">
+		  <h3 style="text-align:left; padding-top:1%; padding-left:2%">Hierarchical Clustering Heat Map</h3>
+	   </div>
+	   <div class="row" style="padding-bottom:1%">
+	   </div>
+	   <div class="row"style="padding-bottom:0%">
+		  <div class="col-lg-5" id="hcHeatMapColumn" style="padding-left:50px;padding-top:40px">
+			 <div class="row">
+				<hc-heat-map data="heatMapData" cluster="clusterLineData" clusterkey="clusterKey" attr1="{{displayLabels}}" attr2="{{minFoldChange}}" attr3="{{maxFoldChange}}"></hc-heat-map>
+			 </div>
+		  </div>
+		  <div class="col-lg-7" style="padding-right:1%">
+			 <h4 style="margin-bottom:10px;">Select Branch</h4>
+			 <form name="heatMapSettingsForm" novalidate>
+				<select class="form-control"  ng-model='chosenBranch' required="required" data-ng-options="v as v.branch_name for v in projectBranches track by v.branch_id" ng-change="queryBranchNodes()" >
+				   <option style="display:none" value="">Project Branches</option>
+				</select>
+				<div class="row" ng-hide="!monitorClusterProgress" style="padding-left:20px;margin-top:20px;padding-right:20px">
+				   <h4 style="padding-bottom:10px">Hierarchical Clustering Progress</h4>
+				   <div ng-repeat="process in clusterProgressData">
+					  <div class="row" style="padding-left:10px;" ng-hide="process.progress==='100'">
+						 <p style="text-align:left;margin-bottom:5px;margin-right:10px; font-size:13px" ng-bind-html="process.s1"></p>
+						 <div class="progressbar-small progressbar" style="margin-bottom:10px;margin-right:10px">
+							<div class="progressbar-value bg-primary" ng-style="{'width' : process.progress + '%' }">
+							   <div class="progress-overlay"></div>
+							</div>
+						 </div>
+					  </div>
+				   </div>
+				</div>
+				<div class="panel-group" id="accordionHC1" style="margin-top:20px">
+				   <div class="panel" style="overflow: visible;">
+					  <div class="panel-heading">
+						 <h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordionHC1" href="#collapseHCOne" >
+							Hierarchical Clustering Settings
+							</a>
+						 </h4>
+					  </div>
+					  <div id="collapseHCOne" class="panel-collapse collapse in">
+						 <div class="panel-body">
+							<div class="col-xs-5" style="padding-top:10px">
+							   <div ng-init="useConds=false"></div>
+							   <div class="form-group" style="text-align:center">
+								  <label class="radio-inline">
+								  <input type="radio" id="useConds" ng-model="useConds" ng-value="true" ng-change="clusterModeChange(); checkForExistingAnalysis()">
+								  Use Conditions
+								  </label>
+								  <label class="radio-inline">
+								  <input type="radio" id="useReps" ng-model="useConds" ng-value="false" ng-change="clusterModeChange(); checkForExistingAnalysis()">
+								  Use Replicates
+								  </label>
+							   </div>
+							   <!-- <multiselect-view name="mySelect" id="mySelect" class="multi-select"></multiselect-view> -->
+							   <select multiple id="mySelect" data-ng-options="val as val.name for val in selectedValues.all track by val.id" data-ng-model="selectedValues.selected" data-multi-select="selectedValues.all"></select>
+							   <!--  <select multiple data-ng-options="option as option for option in options" data-ng-model="selectedOptions4" data-multi-select="options"></select> -->
+							   <p style="padding-top:7%;color:gray;text-align:center" ng-show="!heatMapSettingsForm.$valid"><span class="glyph-icon icon-ban" style="text-align:center; color:gray; padding-left:5px;"></span> Incomplete Analysis Settings</p>
+							   <p style="padding-top:7%;color:red;text-align:center" ng-show="heatMapSettingsForm.$valid && !prevAnalysisAvailable"><span class="glyph-icon icon-times" style="text-align:center; color:red; padding-left:5px;"></span> Clustering Not Yet Performed</p>
+							   <p style="padding-top:7%;color:green;text-align:center" ng-show="heatMapSettingsForm.$valid && prevAnalysisAvailable"><span class="glyph-icon icon-check" style="text-align:center; color:green; padding-left:5px;"></span> Clustering Results Currently Available</p>
+							</div>
+							<div class="col-xs-7" style="padding-top:10px; padding-left:10px">
+							   <p>Previous Heat Maps/Analyses</p>
+							   <ui-select ng-model="chosenPrevAnalysis.selected" theme="bootstrap" style="width:100%;margin-bottom:0px" ng-change="selectedMapChange(); checkForExistingAnalysis()">
+								  <ui-select-match placeholder="Select an existing analysis..." >{{$select.selected.short}}</ui-select-match>
+								  <ui-select-choices repeat="item in prevHeatMaps | filter: $select.search" group-by="clusterType">
+									 <div ng-bind-html="item.text | highlight: $select.search"></div>
+								  </ui-select-choices>
+							   </ui-select>
+							   <div class="col-xs-4" style="padding-left:0px;padding-top:15px;padding-right:15px">
+								  <p>Row Distance</p>
+								  <select class="form-control" data-ng-options="v as v.name for v in distances track by v.id" ng-model='rowDist' ng-change="checkForExistingAnalysis()" required="true">
+									 <option style="display:none" value=""></option>
+								  </select>
+								  <p style="padding-top:10px">Row Linkage</p>
+								  <select class="form-control" data-ng-options="v as v.name for v in linkages track by v.id" ng-model='rowLink' ng-change="checkForExistingAnalysis()" required="true">
+									 <option style="display:none" value=""></option>
+								  </select>
+								  <p style="padding-top:10px">Column Distance</p>
+								  <select class="form-control" data-ng-options="v as v.name for v in distances track by v.id" ng-model='colDist' ng-change="checkForExistingAnalysis()" required="true">
+									 <option style="display:none" value=""></option>
+								  </select>
+								  <p style="padding-top:14px">Column Linkage</p>
+								  <select class="form-control" data-ng-options="v as v.name for v in linkages track by v.id" ng-model='colLink' ng-change="checkForExistingAnalysis()" required="true">
+									 <option style="display:none" value=""></option>
+								  </select>
+							   </div>
+							   <div class="col-xs-8" style="padding-right:0px;padding-top:15px">
+								  <p>Minimum Fold Change</p>
+								  <input class="form-control" name="minFC" ng-model='minFoldChange' type="number" required="true" lower-than="{{maxFoldChange}}" step="0.1">
+								  <span class="parsley-required" ng-show="heatMapSettingsForm.minFC.$error.lowerThan">
+								  Minimum cannot exceed or equal maximum.
+								  </span>
+								  <p style="padding-top:10px">Maximum Fold Change</p>
+								  <input class="form-control" name="maxFC" ng-model='maxFoldChange' type="number" required="true" step="0.1">
+								  <p style="padding-top:10px">Color Gradient</p>
+								  <ui-select ng-model="colorGradient.selected" theme="bootstrap" style="width:100%;margin-bottom:0px" ng-change="gradChange(); checkForExistingAnalysis()" required="true">
+									 <ui-select-match placeholder="Select a gradient..."><img style="vertical-align:text-top;padding-right:5px; width:46px" ng-src="{{ $select.selected.img }}"/> {{$select.selected.name}}</ui-select-match>
+									 <ui-select-choices repeat="grad in colorGradients| filter: $select.search" group-by="groupFind">
+										<img ng-src="{{ grad.img }}" style="width:46px"/>
+										<div ng-bind-html="grad.name | highlight: $select.search" style="display: inline"></div>
+									 </ui-select-choices>
+								  </ui-select>
+								  <div class="row" style="padding-left:10px;padding-right:10px" ng-hide="!cust3">
+									 <div class="col-xs-4" style="padding-left:0px;padding-right:0px">
+										<p style="text-align:center;padding-top:10px">Low</p>
+										<input type="text" name="colorpicker-inline3" id="colorpicker-tl-3-low" class="form-control float-left" style="width:100%">
+									 </div>
+									 <div class="col-xs-4" style="padding-left:0px;padding-right:0px">
+										<p style="text-align:center;padding-top:10px">Mid</p>
+										<input type="text" name="colorpicker-inline4" id="colorpicker-tl-3-mid" class="form-control float-left" style="width:100%">
+									 </div>
+									 <div class="col-xs-4" style="padding-left:0px;padding-right:0px">
+										<p style="text-align:center;padding-top:10px">High</p>
+										<input type="text" name="colorpicker-inline5" id="colorpicker-tl-3-high" class="form-control float-left" style="width:100%">
+									 </div>
+								  </div>
+								  <div class="row" style="padding-left:10px;padding-right:10px" ng-hide="!cust2">
+									 <div class="col-xs-6" style="padding-left:0px;padding-right:0px">
+										<p style="text-align:center;padding-top:10px">Low</p>
+										<input type="text" name="colorpicker-inline1" id="colorpicker-tl-2-low" class="form-control float-left" style="width:100%">
+									 </div>
+									 <div class="col-xs-6" style="padding-left:0px;padding-right:0px">
+										<p style="text-align:center;padding-top:10px">High</p>
+										<input type="text" name="colorpicker-inline2" id="colorpicker-tl-2-high" class="form-control float-right" style="width:100%">
+									 </div>
+								  </div>
+								  <p style="padding-top:10px">Desired Number of Clusters</p>
+								  <input class="form-control"  ng-model='clusterCount' type="number" required="true">
+							   </div>
+							   <button class="btn btn-alt btn-hover btn-primary" style="width:100%; margin-bottom:5px; margin-top:20px" ng-click="generateHeatMap()" ng-disabled="!heatMapSettingsForm.$valid">
+							   <span>Update Heat Map</span>
+							   <i class="glyph-icon icon-fire"></i>
+							   </button>
+							</div>
+						 </div>
+					  </div>
+				   </div>
+				</div>
+			 </form>
+			 <div class="panel-group" id="accordionHC2" style="margin-top:20px">
+				<div class="panel">
+				   <div class="panel-heading">
+					  <h4 class="panel-title">
+						 <a data-toggle="collapse" data-parent="#accordionHC2" href="#collapseHCTwo" aria-expanded="false" class="collapsed">
+						 Cluster Profile
+						 </a>
+					  </h4>
+				   </div>
+				   <div id="collapseHCTwo" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+					  <div class="panel-body">
+						 <div class="col-xs-5">
+							<h4 style="padding-bottom:10px">Cluster Molecules � {{clusterMolCount}}</h4>
+							<table data-toggle="table" data-cache="false"  data-height="350" id="clusterProfTable"  data-pagination="true"  data-show-columns="true" data-search="true" style="font-size:12px;">
+							   <thead style="font-size:12px">
+								  <tr>
+									 <th data-field="molName" data-sortable="true" style="text-transform:none">Molecule Name</th>
+								  </tr>
+							   </thead>
+							</table>
+						 </div>
+						 <div class="col-xs-7">
+							<h4 style="padding-bottom:10px">Cluster Plot � Highlighted Molecule: {{clusterMolHighlight}}</h4>
+							<div id="clusterLinePlotColumn">
+							   <cluster-line-plot data="clusterLineData" conditions="conditions" highlight="clusterMolHighlight"></cluster-line-plot>
+							</div>
+						 </div>
+						 <div class="col-xs-12">
+							<button class="btn btn-alt btn-hover btn-primary pull-right" style="width:48%; margin-bottom:5px; margin-top:10px" ng-click="downloadClusterPlotCSV()">
+							<span>Download Plot CSV</span>
+							<i class="glyph-icon icon-file"></i>
+							</button>
+							<button class="btn btn-alt btn-hover btn-primary pull-left" style="width:48%; margin-bottom:5px; margin-top:10px" ng-click="downloadClusterPlotSVG()">
+							<span>Download Plot SVG</span>
+							<i class="glyph-icon icon-image"></i>
+							</button>
+						 </div>
+					  </div>
+				   </div>
+				</div>
+			 </div>
+			 <div class="panel-group" id="accordionHC3" style="margin-top:20px">
+				<div class="panel">
+				   <div class="panel-heading">
+					  <h4 class="panel-title">
+						 <a data-toggle="collapse" data-parent="#accordionHC3" href="#collapseHCThree" aria-expanded="false" class="collapsed">
+						 Gene Ontology (GO)
+						 </a>
+					  </h4>
+				   </div>
+				   <div id="collapseHCThree" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+					  <div class="panel-body">
+						 <div class="col-xs-12" style="padding-bottom:.5%">
+							<p style="text-align:center"><b>Gene Ontology Enrichment Analysis. </b>This on-demand analysis will identify GO terms which are over- or under-represented within your current set of hierarchical clusters, relative to all other clusters (i.e., all other clusters are used as a background).</p>
+							<hr style="padding:1px; margin:7px">
+							<div class="row">
+							   <p class="pull-left" style="padding-top:0%;padding-left:13%;color:green" ng-show="goTermsMapped"><span class="glyph-icon icon-check pull-right" style="text-align:left; color:bg-gradient-8; padding-left:5px;"></span> GO Terms Mapped to Current Data</p>
+							   <p class="pull-left parsley-required" style="padding-top:0%;padding-left:13%" ng-show="!goTermsMapped"><span class="glyph-icon icon-close pull-right" style="text-align:left; color:bg-gradient-8; padding-left:5px;"></span> GO Terms <i>NOT</i> Mapped to Current Data</p>
+							   <p class="pull-right" style="padding-top:0%;padding-right:10%;color:green" ng-show="goTermDataAvailable"><span class="glyph-icon icon-check pull-right" style="text-align:right; color:green; padding-left:5px;"></span> GO Enrichment Analysis Results Currently Available</p>
+							   <p class="pull-right parsley-required" style="padding-top:0%;padding-right:10%;" ng-show="!goTermDataAvailable"><span class="glyph-icon icon-close pull-right" style="text-align:right; padding-left:5px;"></span> GO Enrichment Analysis Results <i>NOT</i> Currently Available</p>
+							</div>
+							<hr style="padding:1px; margin:7px">
+							<div class="col-xs-6" style="padding:0px;margin:0px">
+							   <button class="btn btn-alt btn-hover btn-primary pull-left" style="width:90%;margin-left:7px" ng-click="startClusterGOAnalysis()" ng-disabled="!goTermCompat">
+							   <span>Start GO Analysis for Current Clusters</span>
+							   <i class="glyph-icon icon-bolt"></i>
+							   </button>
+							</div>
+							<div class="col-xs-6">
+							   <div class="progressbar-small progressbar" style="margin-bottom:15px;margin-right:7px;width:100%;margin-top:12px">
+								  <div class="progressbar-value bg-primary" ng-style="{'width' : goClusterProgress + '%' }">
+									 <div class="progress-overlay"></div>
+								  </div>
+							   </div>
+							</div>
+							<div class="col-xs-12" style="padding:0px;margin:0px">
+							   <hr style="padding:1px; margin:7px">
+							</div>
+						 </div>
+						 <div class="col-xs-7">
+							<h4 style="padding-bottom:10px">Enriched GO Terms</h4>
+							<table data-toggle="table" data-cache="false"  data-height="400" id="clusterGOTableOne" data-show-columns="true" data-pagination="true"  data-search="true" style="font-size:12px;">
+							   <thead style="font-size:12px">
+								  <tr>
+									 <th data-field="goTerm" data-visible="true" data-sortable="true" style="text-transform:none">GO Term</th>
+									 <th data-field="extID" data-visible="false" data-sortable="true" style="text-transform:none">External ID</th>
+									 <th data-field="namespace" data-visible="false" data-sortable="true" style="text-transform:none">Namespace</th>
+									 <th data-field="pValue" data-visible="false" data-sortable="true" style="text-transform:none">P-Value</th>
+									 <th data-field="pValueFDR" data-visible="true" data-sortable="true" style="text-transform:none">P-Value (FDR-Adjusted)</th>
+									 <th data-field="pValueBonf" data-visible="false" data-sortable="true" style="text-transform:none">P-Value (Bonferroni-Adjusted)</th>
+									 <th data-field="matched" data-visible="true" data-sortable="true" style="text-transform:none">Matched Molecules</th>
+									 <th data-field="enrich" data-visible="true" data-sortable="true" style="text-transform:none">Enrichment</th>
+								  </tr>
+							   </thead>
+							</table>
+						 </div>
+						 <div class="col-xs-5">
+							<h4 style="padding-bottom:10px">Cluster Molecules</h4>
+							<table data-toggle="table" data-cache="false"  data-height="400" id="clusterGOTableTwo"  data-pagination="true"  data-search="true" style="font-size:12px;">
+							   <thead style="font-size:12px">
+								  <tr>
+									 <th data-field="molName" data-sortable="true" style="text-transform:none">Molecule Name</th>
+									 <th data-field="hasTerm" data-sortable="true" style="text-transform:none">Has Term</th>
+								  </tr>
+							   </thead>
+							</table>
+						 </div>
+					  </div>
+				   </div>
+				</div>
+			 </div>
+			 <div class="row" style="padding-top:0.5%;padding-bottom:1%">
+				<p style="text-align:center;width:95%" class="center-block" ng-bind-html="heatMapFigLegendText" id="figLegend"></p>
+			 </div>
+			 <div style="padding-top:0.5%;padding-bottom:1.5%; text-align:center">
+				<label class="checkbox-inline" style="padding-right:5%">
+				<input type="checkbox" id="" ng-model="displayLabels" >
+				Show Heat Map Labels
+				</label>
+				<button class="btn btn-alt btn-hover btn-primary pull-right" style="width:30%;margin-right:1%" ng-click="downloadHeatMapSVG()" >
+				<span>Download Heat Map SVG</span>
+				<i class="glyph-icon icon-image"></i>
+				</button>
+				<button class="btn btn-alt btn-hover btn-primary pull-right" style="width:30%;margin-right:1%" ng-click="downloadHeatMapCSV()" >
+				<span>Download Heat Map CSV</span>
+				<i class="glyph-icon icon-file"></i>
+				</button>
+			 </div>
+          <hr style="margin-top:5px;margin-bottom:5px">
+           <button class="btn btn-alt btn-hover btn-danger pull-right" style="width:30%;margin-bottom:10px;margin-top:17px; margin-right:10px" ng-click="deleteAllClusterAnalyses()" ng-disabled="false">
+               <span>Delete All Clustering Analyses</span>
+               <i class="glyph-icon icon-trash"></i>
+               </button>
+
+               <button class="btn btn-alt btn-hover btn-danger pull-right" style="width:30%;margin-bottom:10px;margin-top:17px; margin-right:10px" ng-click="deleteCurrentClusterAnalysis()" ng-disabled="chosenPrevAnalysis.selected===undefined">
+               <span>Delete Current Cluster Analysis</span>
+               <i class="glyph-icon icon-trash"></i>
+               </button>
+		  </div>
+	   </div>
+	</div>
+ </div>

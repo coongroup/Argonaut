@@ -1,0 +1,3 @@
+<li class>
+	<a href="#volcanoFullProfileTab" data-toggle="tab" ng-click="volcanoTabClick()">Volcano–Full Profiles</a>
+</li>

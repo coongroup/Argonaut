@@ -1,0 +1,3 @@
+<li class>
+            <a href="#pcaReplicateTab" data-toggle="tab">PCA–Replicates</a>
+         </li>

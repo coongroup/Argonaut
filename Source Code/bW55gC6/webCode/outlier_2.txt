@@ -1,0 +1,121 @@
+<div class="tab-pane" id="outlierTab" style="padding-left:0px; margin-top:20px">
+   <div class="col-md-10 center-margin">
+      <div ng-controller="outlierCtrl" id="outlierCtrlID">
+         <div class="col-lg-5 row" style="margin-bottom:10px">
+            <h2 style="margin-bottom:10px">Outlier Analysis</h2>
+            <!--Volcano plot goes here, wrap in a div then put text below-->
+            <div id="outlierVolcanoColumn" style="padding-bottom:20px">
+               <outlier-volcano data="quantData" attr1="{{maxCondition}}", attr2="{{selectedMolecule}}", attr3="{{testingCorrection}}"></outlier-volcano>
+            </div>
+            <div class="panel-group" id="accordionOutlierMetadata" style="margin-top:20px; width:90%; padding-left:5%">
+               <div class="panel">
+                  <div class="panel-heading">
+                     <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordionOutlierMetadata" href="#collapseOutlierMetadata" aria-expanded="false" class="collapsed">
+                        Molecule Metadata {{displayMolecule}}
+                        </a>
+                     </h4>
+                  </div>
+                  <div id="collapseOutlierMetadata" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                     <div class="panel-body">
+                        <div>
+                           <div ng-bind-html="metadataText" style="padding-bottom:0px;word-break: break-all"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="panel-group" id="accordionOutlierQuant" style="margin-top:20px; width:90%; padding-left:5%">
+               <div class="panel">
+                  <div class="panel-heading">
+                     <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordionOutlierQuant" href="#collapseOutlierQuant" aria-expanded="false" class="collapsed">
+                        Quantitative Data{{displayCondition}}
+                        </a>
+                     </h4>
+                  </div>
+                  <div id="collapseOutlierQuant" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                     <div class="panel-body">
+                        <div>
+                           <div ng-bind-html="quantDataText" style="padding-bottom:0px;word-break: break-all"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <p style="text-align:center;padding-bottom:20px;width:90%;padding-top:10px"><b>Figure Legend: </b>Fold changes in {{displayMolecule}} abundance log<sub>2</sub>(condition/control) versus statistical significance (-log<sub>10</sub>[<i>p</i>-value]) are shown above. The red data point ({{displayMolecule}} changes in {{displayCondition}}) was identified as a characteristic outlier by the {{algorithm.name}} algorithm.</p>
+            
+         </div>
+         <div class="col-lg-7 row" style="margin-bottom:10px;">
+            <h2 style="margin-bottom:20px">Datapoints of Interest</h2>
+            <div class="col-lg-6 row" style="margin-left:0px; margin-right:0px; padding-left:0px; padding-right:0px">
+               <h4 style="margin-bottom:10px">Select a Branch</h4>
+               <select id="outlierAlgorithmSelect" style="margin-bottom:10px; width:90%" class="form-control pull-left"  ng-model='outlierBranch' required="required" data-ng-options="v as v.branch_name for v in outlier_branch_data track by v.branch_id" ng-change="branchChanged()">
+                  <option style="display:none" value=""></option>
+               </select>
+            </div>
+            <div class="col-lg-6 row" style=" margin-left:0px; margin-right:0px; padding-left:0px; padding-right:0px">
+               <h4 style="margin-bottom:10px; margin-left:10%">Select an Algorithm</h4>
+               <select id="outlierAlgorithmSelect" style="margin-bottom:10px; width:90%" class="form-control pull-right"  ng-model='algorithm' required="required" data-ng-options="v as v.name for v in algorithms track by v.value" ng-change="algorithmChanged()">
+                  <option style="display:none" value=""></option>
+               </select>
+            </div>
+            <div id="outlierTableWrapper">
+               <table data-toggle="table" data-cache="false"  data-height="500" id="OutlierTableOne"  data-pagination="true"  data-show-columns="true" data-search="true" style="font-size:12px;">
+                  <thead style="font-size:12px">
+                     <tr style=" word-break: break-word;">
+                        <th data-field="molName" data-sortable="true" style="text-transform:none;">Molecule Name</th>
+                        <th data-field="regulation" data-sortable="true" >Regulation</th>
+                        <th data-field="condName" data-sortable="true" >Condition</th>
+                        <th data-field="distance" data-sortable="true">Distance</th>
+                        <th data-field="foldChange" data-sortable="true">Fold Change</th>
+                        <th data-field="pValue" data-sortable="true">P-Value</th>
+                     </tr>
+                  </thead>
+               </table>
+            </div>
+            <div class="panel-group" id="accordionOutlier" style="margin-top:20px">
+               <div class="panel">
+                  <div class="panel-heading">
+                     <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordionOutlier" href="#collapseOutlier" aria-expanded="false" class="collapsed">
+                        Returned Result Filters
+                        </a>
+                     </h4>
+                  </div>
+                  <div id="collapseOutlier" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                     <div class="panel-body">
+                        <div class="col-md-5">
+                           <h5 style="margin:5px; padding-bottom:10px">Multiple Testing Correction</h5>
+                           <form name="myForm">
+                              <input type="radio" ng-model="testingCorrection" value="uncorrected">
+                              Uncorrected
+                              <br/>
+                              <input type="radio" ng-model="testingCorrection" value="fdradjusted">
+                              FDR
+                              <br/>
+                              <input type="radio" ng-model="testingCorrection" value="bonferroni">
+                              Bonferroni
+                              <br/>
+                           </form>
+                           <h5 style="margin:5px; margin-top:15px">List Molecule Entry By</h5>
+                           <form name="outlierMoleculeListingForm">
+                              <select id="outlierMoleculeTermDropDown" style="margin-bottom:10px" class="form-control" ng-change="moleculeNameChanged()" ng-model='outlierMoleculeTerm' required="required" data-ng-options="v for v in moleculeSeekTerms">
+                                 <option style="display:none" value=""></option>
+                              </select>
+                           </form>
+                        </div>
+                        <div class="col-md-7">
+                           <h5 style="margin:5px">P-Value Cutoff</h5>
+                           <input class="form-control" id="" ng-model="pValueCutoff" style="margin-bottom:15px">
+                           <h5 style="margin:5px">Fold Change Cutoff (±)</h5>
+                           <input type="text" class="form-control" id=""  ng-model="foldChangeCutoff" style="margin-bottom:10px">
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

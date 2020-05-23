@@ -1,0 +1,3 @@
+<li class>
+	<a href="#pcaReplicateTab" data-toggle="tab" ng-click="pcaRepTabClick()">PCA–Replicates</a>
+</li>

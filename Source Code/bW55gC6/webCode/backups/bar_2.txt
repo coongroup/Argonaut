@@ -1,0 +1,97 @@
+<div class="tab-pane" id="barChartTab" style="padding-left:0px; margin-top:20px">
+   <div ng-controller="barChartCtrl">
+      <h2>Fold Changes - {{selectedMolecule.name}}</h2>
+      <div class="col-md-10" style="padding-left:0px; padding-right:0px" id="sdfg">
+         <div id="BarChartFullPlot">
+            <molecule-bar-chart data="quantData" attr1="{{selectedMolecule.name}}", attr2="{{pValueCutoff}}", attr3="{{foldChangeCutoff}}" attr4="{{order}}", attr5="{{testingCorrection}}"></molecule-bar-chart> 
+         </div>
+         <div class="panel-group" id="accordionBarChartMeta" style="margin-top:0px; width:90%; padding-bottom:40px; text-align:block">
+            <div class="panel">
+               <div class="panel-heading">
+                  <h4 class="panel-title">
+                     <a data-toggle="collapse" data-parent="#accordionBarChartMeta" href="#collapseBarChartMeta" aria-expanded="false" class="collapsed"; style="opacity:1">
+                        Tooltip Information (Click Bar to Populate)
+                     </a>
+                  </h4>
+               </div>
+               <div id="collapseBarChartMeta" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                  <div class="panel-body">
+                     <div class="col-md-8">
+                        <div>
+                           <h2 style="padding-bottom:10px;">Molecule Metadata - {{selectedMolecule.name}}</h2>
+                           <div ng-bind-html="tooltipText" style="padding-bottom:0px;word-break: break-all"></div>
+                        </div>
+                     </div>
+                     <div class="col-md-4">
+                        <div>
+                           <h2 style="padding-bottom:10px">Tooltip Information</h2>
+                           <div ng-bind-html="tooltipQuantText" style="padding-bottom:0px"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="col-md-2" style="padding-left:0px; padding-right:0px">
+         <!-- code here needs to be filled in -->
+         <h4 style="margin-bottom:10px">Select a Branch</h4>
+         <select id="barChartBranchSelect" style="margin-bottom:10px" class="form-control"  ng-model="selectedBranch" required="required" data-ng-options="v as v.branch_name for v in bar_chart_branch track by v.branch_id" ng-change="branchChanged()">
+            <option style="display:none" value=""></option>
+         </select>
+         <h4 style="margin-bottom:10px">Bar Ordering</h4>
+         <select id="pcaCondXAxisSelect" style="margin-bottom:20px" class="form-control"  ng-model="order" required="required" data-ng-options="v as v.name for v in bar_chart_order track by v.value" ng-change="sortData()">
+            <option style="display:none" value=""></option>
+         </select>
+         <h4 style="margin-bottom:10px">Select Molecule</h4>
+         <ui-select multiple limit="1" ng-model="item.term" theme="bootstrap" style="width: 100%;margin-bottom:0px;" id="barChartQueryBox" on-select="onSelected($item, $select, $event)" on-remove="onRemove()">
+         <ui-select-match placeholder="Query Term">{{$item.name}}</ui-select-match>
+         <ui-select-choices refresh="searchMedia($select)" refresh-delay="400" repeat="searchRes in searchRes" id="barChartChoices">
+         <div ng-bind-html="searchRes.name | highlight: $select.search"></div>
+      </ui-select-choices>
+   </ui-select>
+   <hr style="opacity:1">
+   <div class="panel-group" id="accordion4" style="margin-top:20px">
+      <div class="panel">
+         <div class="panel-heading">
+            <h4 class="panel-title">
+               <a data-toggle="collapse" data-parent="#accordion4" href="#collapse4" aria-expanded="false" class="collapsed">
+                  Chart Settings
+               </a>
+            </h4>
+         </div>
+         <div id="collapse4" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+               <h5 style="margin:5px">Multiple Testing Correction</h5>
+               <form name="myForm">
+                  <input type="radio" ng-model="testingCorrection" value="uncorrected">
+                  Uncorrected
+                  <br/>
+                  <input type="radio" ng-model="testingCorrection" value="fdradjusted">
+                  FDR
+                  <br/>
+                  <input type="radio" ng-model="testingCorrection" value="bonferroni">
+                  Bonferroni
+                  <br/>
+               </form>
+               <h5 style="margin:5px">P-Value Cutoff</h5>
+               <input class="form-control" id="" ng-model="pValueCutoff"  style="margin-bottom:15px">
+               <h5 style="margin:5px">Fold Change Cutoff (±)</h5>
+               <input type="text" class="form-control" ng-model="foldChangeCutoff" id="" style="margin-bottom:20px">
+            </div>
+         </div>
+      </div>
+   </div>
+   <hr style="opacity:1">
+
+   <button class="btn btn-alt btn-hover btn-primary" style="width:100%; margin-bottom:10px; margin-top:0px" ng-click="downloadData()">
+      <span>Download Chart Data</span>
+      <i class="glyph-icon icon-file-text-o"></i>
+   </button>
+   <button class="btn btn-alt btn-hover btn-primary" style="width:100%; margin-bottom:10px; margin-top:10px" ng-click="downloadSVG()">
+      <span>Download Chart SVG</span>
+      <i class="glyph-icon icon-file-image-o"></i>
+   </button> 
+</div>
+</div>
+</div>

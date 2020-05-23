@@ -1,0 +1,171 @@
+<div class="tab-pane" id="goTab" style="padding-left:0px; margin-top:20px">
+   <div ng-controller="goCtrl" id="goCtrlID">
+      <div class="col-lg-5 row" style="margin-bottom:10px;margin-right:10px">
+         <h2 style="margin-bottom:5px">Full Perturbation Profile–{{goConditionName}}</h2>
+         <h5 style="margin-bottom:0px">GO Term–{{termName}}</h5>
+         <div id="goVolcanoColumn" style="padding-bottom:20px">
+            <go-volcano data="volcanoData" attr1="{{goTerm}}" attr2="{{testingCorrection}}" attr3="{{goConditionName}}" highlight="highlight" go="allMolIDs"></go-volcano>
+         </div>
+        <h4 style="margin-bottom:10px">Select a Branch</h4>
+             <select id="goBranchSelect" style="margin-bottom:10px" class="form-control"  ng-model='goBranch' data-ng-options="v as v.branch_name for v in goBranches track by v.branch_id" ng-change="branchChange()">
+               <option style="display:none" value=""></option>
+            </select>
+         <h4 style="margin-bottom:10px">Select a Condition</h4>
+             <select id="goBranchSelect" style="margin-bottom:10px" class="form-control"  ng-model='goCondition' data-ng-options="v as v.condition_name for v in goConditions track by v.condition_id" ng-change="conditionChange()">
+               <option style="display:none" value=""></option>
+            </select>
+         <h4 style="margin-bottom:10px">Select a GO Term</h4>
+
+               <ui-select multiple limit="1" ng-model="item.term" ng-change="goQueryTermChange()" theme="bootstrap" style="width: 100%;margin-bottom:0px" id="goQueryBox" on-remove="onRemove()" on-select="onSelected($item, $select, $event)">
+               <ui-select-match placeholder="Enter GO Text or Click for Options">{{$item.display}}</ui-select-match>
+               <ui-select-choices limit="25" refresh="searchMedia($select)" refresh-delay="400" repeat="term in shortGOTerms" id="goTermBar">
+               <div ng-bind-html="term.display | highlight: $select.search"></div>
+            </ui-select-choices>
+         </ui-select>
+            <hr style="opacity:1">
+         <div class="panel-group" id="accordionGOOne" style="margin-top:20px">
+               <div class="panel">
+                  <div class="panel-heading">
+                     <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordionGOOne" href="#collapseGOOne" aria-expanded="false" class="collapsed">
+                           GO Term Information
+                        </a>
+                     </h4>
+                  </div>
+                  <div id="collapseGOOne" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                     <div class="panel-body">
+                        <h5 style="padding-bottom:10px"><span style="font-weight:700">GO Term: </span>{{termFullName}}</h5>
+                        <h5 style="padding-bottom:10px"><span style="font-weight:700">GO Term Identifier: </span>{{termExtID}}</h5>
+                        <h5 style="padding-bottom:10px"><span style="font-weight:700">Namespace: </span>{{termNamespace}}</h5>
+                        <h5 style="padding-bottom:10px"><span style="font-weight:700">Definition: </span>{{termDef}}</h5>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <hr style="opacity:1">
+         <div class="panel-group" id="accordionGOTwo" style="margin-top:20px">
+               <div class="panel">
+                  <div class="panel-heading">
+                     <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordionGOTwo" href="#collapseGOTwo" aria-expanded="false" class="collapsed">
+                           Tooltip Settings
+                        </a>
+                     </h4>
+                  </div>
+                  <div id="collapseGOTwo" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                     <div class="panel-body">
+               <h5 style="margin:5px">Feature Descriptor Options</h5>
+               <form name="goTooltipCustomForm">
+
+                  <label ng-repeat="term in featureMetadataTerms" class="checkbox" style="font-weight:100">
+                    <input
+                    type="checkbox"
+                    ng-model="term.selected"
+                    >{{term.name}}
+                 </label>
+              </form>
+              <label class="checkbox-inline" style="margin-top:10px">
+               <input type="checkbox" id="" ng-model="goShortenLongTerms" style="margin-bottom:15px;">
+               Shorten Long Terms
+            </label>
+         </div>
+               </div>
+            </div>
+         </div>
+         <hr style="opacity:1">
+         <div style="width:100%;text-align:center;padding-bottom:20px" class="btn-group">
+            <button class="btn btn-alt btn-hover btn-primary" style="margin-bottom:10px; display:inline-block;width:49%;margin-right:1%" ng-click="downloadData()">
+               <span>Download Chart Data</span>
+               <i class="glyph-icon icon-file-text-o"></i>
+            </button>
+            <button class="btn btn-alt btn-hover btn-primary" style="margin-bottom:10px; display:inline-block;width:49%;margin-left:1%" ng-click="downloadSVG()">
+               <span>Download Chart SVG</span>
+               <i class="glyph-icon icon-file-image-o"></i>
+            </button>
+         </div>
+      </div>
+      <div class="col-lg-7 row" style="margin-bottom:10px;margin-left:10px">
+         <h2 style="margin-bottom:15px">Custom GO Enrichment Analysis Settings</h2>
+         <h4 style="margin-bottom:10px">Define Measurement Cutoff</h4>
+         <div class="row" style="text-align:center;margin-left:5px;margin-right:5px;margin-bottom:0px">
+            <form id="cutoffForm" name="cutoffForm">
+            <label for="foldChangeSymbol">Keep Molecules Where Fold Change </label>
+            <select id="foldChangeSymbol" style="width:90px; display:inline-block" class="form-control"  ng-model='fcSymbol' ng-change="">
+                <option value=">">></option>
+                  <option value="<"><</option>
+                  <option value="> or <">> or <</option>
+            </select>
+            <input class="form-control" type="text" ng-model="goFCCutoff" name="goFCCutoff" style="width:70px; display:inline-block;text-align:center;" 
+            range range-min="-50" range-max="50" ng-class="{'parsley-error' : cutoffForm.$error.validFC}"></input>
+            <label for="pValueChangeSymbol"> and <i>P</i>-Value </label>
+            <select id="pValueChangeSymbol" style="width:90px; display:inline-block" class="form-control"  ng-model='pValueSymbol' ng-change="">
+                <option value=">">></option>
+                  <option value="<"><</option>
+                  <option value="> or <">> or <</option>
+            </select>
+            <input class="form-control" type="text" ng-model="goPValueCutoff" name="goPValueCutoff" style="width:70px; display:inline-block;text-align:center" 
+            allow-zero-to-one ng-class="{'parsley-error' : cutoffForm.$error.validP}"></input>
+             <span ng-show="cutoffForm.$error.validFC" class="parsley-required" style="padding-top:5px;text-align:center"><br>Please enter a valid fold change cutoff between -50 and 50.</span>
+             <span ng-show="cutoffForm.$error.validP" class="parsley-required" style="padding-top:5px;text-align:center"><br>Please enter a valid P-value between 0 and 1.</span>
+            <p style="padding-top:15px;">Current Cutoff: <span style="font-style:italic">Molecules having a fold change {{fcSymbol}} {{goFCCutoff}} and a <i>P</i>-value {{pValueSymbol}} {{goPValueCutoff}} will be tested for GO term enrichments.</span></p>
+  
+          </div>
+          <div class="row" style="margin-top:0px;margin-bottom:15px;margin-left:10px">
+           
+         </div>
+         <div class="row" style="margin-bottom:5px;margin-left:10px;padding-right:5px">
+         <div class="col-md-4" style="text-align:left;margin-bottom:10px">
+             <label class="checkbox" style="font-weight:100"><input type="checkbox" id="" ng-model="repeatAllConds" style="margin-bottom:5px">Repeat for all Conditions in Branch</label>
+          </div>
+
+          <div class="col-md-8" style="padding-top:10px;padding-bottom:0px">
+            <button class="btn btn-alt btn-hover btn-primary pull-right" style="margin-bottom:10px;margin-left:2%" ng-click="startGOProcessing()" ng-disabled="cutoffForm.$invalid || goCondition.condition_id===undefined">
+               <span>Calculate GO Enrichments</span>
+               <i class="glyph-icon icon-calculator"></i>
+            </button>
+            <button class="btn btn-alt btn-hover btn-primary pull-right" style="margin-bottom:10px;" ng-click="highlightMoleculeCutoffs()" ng-disabled="cutoffForm.$invalid || goCondition.condition_id===undefined">
+               <span>View Molecules in Chart</span>
+               <i class="glyph-icon icon-search"></i>
+            </button>
+         </div>
+         </form>
+         </div>
+         <div class="row" ng-hide="!monitorGOProcesses" style="margin-bottom:10px;margin-left:5px">
+            <h4 style="margin-bottom:5px">GO Enrichment Progress</h4>
+               <div ng-repeat="(key, process) in goProcesses | running">
+                  <p style="text-align:right;margin-bottom:5px;color:gray;margin-right:10px">Calculating GO enrichments where {{process.display}}</p>
+                  <div class="progressbar-small progressbar" style="margin-bottom:15px;margin-right:10px">
+                     <div class="progressbar-value bg-primary" ng-style="{'width' : process.progress + '%' }">
+                        <div class="progress-overlay"></div>
+                     </div>
+                  </div> 
+               </div>
+         </div>
+         
+         <div class="row"></div>
+          <hr style="margin-top:5px;margin-bottom:15px">
+         <h2>GO Enrichment Analysis Results</h2>
+         <h4 style="margin-bottom:10px;padding-top:10px">Previous Analyses</h4>
+            <select id="goPrevAnalysisSelect" style="margin-bottom:30px" class="form-control"  ng-model='previousGoAnalysis' data-ng-options="v as v.display for v in completedGOAnalyses track by v.id" ng-change="getPreviousGOAnalysis()">
+               <option style="display:none" value=""></option>
+            </select>
+         <div id="goTableWrapper">
+            <table data-toggle="table" data-cache="false" id="GOTableOne"  data-height="500" data-pagination="true"  data-show-columns="true" data-search="true" style="font-size:12px;">
+               <thead style="font-size:12px">
+                  <tr style=" word-break: break-word;">
+                     <th data-field="goTerm" data-sortable="true" style="text-transform:none;">GO Term</th>
+                     <th data-field="extID" data-sortable="true" style="text-transform:none;">External ID</th>
+                     <th data-field="pVal" data-sortable="true" >P-Value</th>
+                     <th data-field="pValFDR" data-sortable="true">FDR-Adjusted Q-Value</th>
+                     <th data-field="pValBonferroni" data-sortable="true">Bonferroni-Adjusted P-Value</th>
+                  </tr>
+               </thead>
+            </table>
+         </div>
+          <button class="btn btn-alt btn-hover btn-primary pull-right" style="margin-bottom:10px;margin-top:20px" ng-click="downloadGOData()">
+               <span>Download Table Data</span>
+               <i class="glyph-icon icon-download"></i>
+            </button>
+         </div>
+      </div>
+   </div>

@@ -1,0 +1,3 @@
+<li class>
+	<a href="#goTab" data-toggle="tab" ng-click="goTabClick()">Gene Ontology</a>
+</li>

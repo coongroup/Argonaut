@@ -1,0 +1,31 @@
+<div class="tab-pane" id="pcaReplicateTab" style="padding-left:0px; margin-top:20px">
+   <div ng-controller="pcaRepCtrl">
+      <h2>Principal Components Analysis {{"– " +pcaBranch.branch_name}}</h2>
+      <div class="col-md-10" style="padding-left:0px; padding-right:0px" id="pcaRepColumn">
+         <pca-replicate data="pca_branch_data" attr1="{{pcaXAxis.name}}", attr2="{{pcaYAxis.name}}", attr3="{{pcaXFraction | setDecimal:3}}", attr4="{{pcaYFraction | setDecimal:3}}"></pca-replicate>
+      </div>
+      <div class="col-md-2" style="padding-left:0px; padding-right:0px">
+         <h4 style="margin-bottom:10px">Select a Branch</h4>
+         <select id="pcaCondBranchSelect" style="margin-bottom:10px" class="form-control"  ng-model="pcaBranch" required="required" data-ng-options="v as v.branch_name for v in pca_branch track by v.branch_id" ng-change="">
+            <option style="display:none" value=""></option>
+         </select>
+         <h4 style="margin-bottom:10px">Principal Component (X-Axis)</h4>
+         <select id="pcaCondXAxisSelect" style="margin-bottom:20px" class="form-control"  ng-model="pcaXAxis" required="required" data-ng-options="v as v.name for v in pca_components track by v.value" ng-change="updatePCAData()">
+            <option style="display:none" value=""></option>
+         </select>
+         <h4 style="margin-bottom:10px">Principal Component (Y-Axis)</h4>
+         <select id="pcaCondYAxisSelect" style="margin-bottom:20px" class="form-control"  ng-model="pcaYAxis" required="required" data-ng-options="v as v.name for v in pca_components track by v.value" ng-change="updatePCAData()">
+            <option style="display:none" value=""></option>
+         </select>
+         <hr style="opacity:1">
+         <button class="btn btn-alt btn-hover btn-primary" style="width:100%; margin-bottom:10px; margin-top:0px" ng-click="downloadData()">
+            <span>Download Chart Data</span>
+            <i class="glyph-icon icon-file-text-o"></i>
+         </button>
+         <button class="btn btn-alt btn-hover btn-primary" style="width:100%; margin-bottom:10px; margin-top:10px" ng-click="downloadSVG()">
+            <span>Download Chart SVG</span>
+            <i class="glyph-icon icon-file-image-o"></i>
+         </button>
+      </div>
+   </div>
+</div>
