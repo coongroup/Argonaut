@@ -5,7 +5,7 @@
 
 Argonaut is a web-based utility which facilitates collaborative exploration of Condition/Control-type mass spectrometry experiments. Spreadsheets of quantitative values can be uploaded and organized in a way that best describes your specific experimental setup. Brief statistical analysis is conducted on uploaded data to calculate the significance of molecular perturbations for each condition. These data can then be queried on-the-fly to conduct commonly conducted analyses inside the data portal, including volcano plots, GO enrichment, linear correlations, and others.
 
-To facilitate the implementation of Argonaut by the scientific community, we have compiled Argonaut into a Docker image located at a Argonaut's Docker repository: [https://hub.docker.com/r/coonlabs/Argonaut](https://hub.docker.com/r/coonlabs/Argonaut)
+To facilitate the implementation of Argonaut by the scientific community, we have compiled Argonaut into a Docker image located at a Argonaut's Docker repository: [https://hub.docker.com/r/coonlabs/argonaut](https://hub.docker.com/r/coonlabs/argonaut)
 
 The source code for Argonaut is contained in this repository for inspection. Those that would like to implement Argonaut themselves can start here. 
 
