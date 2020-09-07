@@ -1,0 +1,10 @@
+[24-Jul-2020 00:06:27 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function AddReplicateDaToDatabase() in /var/www/html/DV/wpRXu8V/advancedProcess.php:228
+Stack trace:
+#0 /var/www/html/DV/wpRXu8V/advancedProcess.php(59): HandleUpload('1', 'wpRXu8V-9S', 'wpRXu8V', Object(PDO))
+#1 {main}
+  thrown in /var/www/html/DV/wpRXu8V/advancedProcess.php on line 228
+[24-Jul-2020 00:23:37 UTC] PHP Fatal error:  Uncaught RuntimeException: Failed to add file! in /var/www/html/DV/wpRXu8V/validateData.php:67
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/DV/wpRXu8V/validateData.php on line 67
+[14-Aug-2020 21:56:37 UTC] PHP Warning:  rmdir(DV/8Wg3wyp): No such file or directory in /var/www/html/deleteProject.php on line 116

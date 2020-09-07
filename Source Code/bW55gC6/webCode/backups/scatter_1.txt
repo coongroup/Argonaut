@@ -1,3 +1,0 @@
-<li class>
-            <a href="#scatterCorrelationTable" data-toggle="tab">Scatter–Correlations</a>
-         </li>

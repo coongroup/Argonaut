@@ -1,3 +1,0 @@
-<li class>
-            <a href="#goTab" data-toggle="tab">Gene Ontology</a>
-         </li>
